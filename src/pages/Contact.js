@@ -3,10 +3,10 @@ import Footer from "../components/Footer";
 import "../styles/Contact.css";
 
 const contactInfo = [
-  { icon: "📞", title: "Call Us", value: "+91 98765 43210", sub: "Mon–Sat, 8AM–8PM IST" },
-  { icon: "✉️", title: "Email Us", value: "hello@theorganiceditorial.in", sub: "We reply within 2 hours" },
+  { icon: "📞", title: "Call Us", value: "+91 94136 26864", sub: "Mon–Sat, 8AM–8PM IST" },
+  { icon: "✉️", title: "Email Us", value: "utkgokhroo@gmail.com", sub: "We reply within 2 hours" },
   { icon: "📍", title: "Warehouse", value: "Koramangala, Bengaluru – 560095", sub: "No walk-in, delivery only" },
-  { icon: "💬", title: "WhatsApp", value: "+91 98765 43210", sub: "Quick order support" },
+  { icon: "💬", title: "WhatsApp", value: "+91 94136 26864", sub: "Quick order support" },
 ];
 
 const hours = [
@@ -104,7 +104,7 @@ export default function Contact() {
                       <input
                         className="form-input"
                         name="name"
-                        placeholder="Priya Sharma"
+                        placeholder="Enter your name here"
                         value={form.name}
                         onChange={handleChange}
                         required
@@ -115,7 +115,7 @@ export default function Contact() {
                       <input
                         className="form-input"
                         name="phone"
-                        placeholder="+91 98765 43210"
+                        placeholder="Mobile no."
                         value={form.phone}
                         onChange={handleChange}
                       />
@@ -127,7 +127,7 @@ export default function Contact() {
                       className="form-input"
                       name="email"
                       type="email"
-                      placeholder="priya@email.com"
+                      placeholder="Enter your email here"
                       value={form.email}
                       onChange={handleChange}
                       required
