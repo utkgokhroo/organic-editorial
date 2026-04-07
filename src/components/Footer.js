@@ -58,7 +58,7 @@ export default function Footer() {
             <button>Join →</button>
           </div>
           <div className="footer-contact-info">
-            <span>📞 +91 98765 43210</span>
+            <span>📞 +91 94136 26864</span>
             <span>✉️ hello@theorganiceditorial.in</span>
           </div>
         </div>
