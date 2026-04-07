@@ -58,14 +58,14 @@ export default function Footer() {
             <button>Join →</button>
           </div>
           <div className="footer-contact-info">
-            <span>📞 +91 94136 26864</span>
+            <span>📞 +91 94136 26864  </span>
             <span>✉️ hello@theorganiceditorial.in</span>
           </div>
         </div>
       </div>
       <div className="footer-bottom">
         <div className="container">
-          <span>© 2024 The Organic Editorial. All rights reserved. | GSTIN: 29AABCU9603R1ZX</span>
+          <span>© 2026 The Organic Editorial. All rights reserved. | GSTIN: 29AABCU9603R1ZX</span>
           <div className="footer-payments">
             <span>UPI</span><span>Visa</span><span>Mastercard</span><span>NetBanking</span>
           </div>
