@@ -19,12 +19,12 @@ const sampleOrders = [
 export default function Profile() {
   const [activeTab, setActiveTab] = useState("overview");
   const [form, setForm] = useState({
-    firstName: "Priya",
-    lastName: "Sharma",
-    email: "priya.sharma@gmail.com",
-    phone: "+91 98765 43210",
-    dob: "1992-07-15",
-    gender: "Female",
+    firstName: "Utkarsh",
+    lastName: "Gokhroo",
+    email: "utkgokhroo@gmail.com",
+    phone: "+91 94136 26864",
+    dob: "08-06-2005",
+    gender: "Male",
   });
   const [saved, setSaved] = useState(false);
 
@@ -180,12 +180,12 @@ export default function Profile() {
                     <div className="address-item default-address">
                       <div className="default-tag">Default</div>
                       <div className="address-type">🏠 Home</div>
-                      <div className="address-name">Priya Sharma</div>
+                      <div className="address-name">Utkarsh Gokhroo</div>
                       <div className="address-text">
-                        Flat 4B, Green Valley Apartments,<br />
-                        Koramangala 5th Block,<br />
-                        Bengaluru – 560095, Karnataka<br />
-                        📞 +91 98765 43210
+                        VIT Mens' Hostel,<br />
+                        Vellore Institute of Technology,<br />
+                        Vellore – 632014, Tamil Nadu<br />
+                        📞 +91 94136 26864
                       </div>
                     </div>
                     <div className="address-item">
