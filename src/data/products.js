@@ -669,7 +669,7 @@ export const products = [
     unit: "100g",
     rating: 4.4,
     reviews: 198,
-    image: "pita.webp",
+    image: "/pita.webp",
     badge: null,
     badgeColor: null,
     inStock: true,
@@ -678,7 +678,6 @@ export const products = [
     tags: ["bakery", "pita", "whole wheat"],
     deliveryTime: "45 mins",
   },
-  // --- More Beverages ---
   {
     id: 36,
     name: "Raw Pressery Apple Juice",
