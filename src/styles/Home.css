@@ -1,4 +1,4 @@
-.home-page {}
+.home-page { animation: fadeIn 0.3s ease; padding-bottom: 64px; }
 
 /* Hero Banner */
 .hero-slider {
