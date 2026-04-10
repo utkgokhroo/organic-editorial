@@ -59,7 +59,7 @@ export default function Footer() {
           </div>
           <div className="footer-contact-info">
             <span>📞 +91 94136 26864  </span>
-            <span>✉️ hello@theorganiceditorial.in</span>
+            <span>✉️ support@theorganiceditorial.in</span>
           </div>
         </div>
       </div>
