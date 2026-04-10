@@ -535,7 +535,7 @@ export const products = [
     unit: "200g Block",
     rating: 4.6,
     reviews: 2156,
-    image: "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=400&q=80",
+    image: "/cheese.jpg",
     badge: "8% OFF",
     badgeColor: "#c62828",
     inStock: true,
