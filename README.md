@@ -27,7 +27,7 @@ The Organic Editorial is a fully functional supermarket website frontend that le
 ## ✨ Features
 
 ### 🛍️ Shopping
-- Browse **55 products** across 8 categories — Fruits, Vegetables, Dairy, Bakery, Beverages, Grains, Snacks, Pantry
+- Browse **54 products** across 8 categories — Fruits, Vegetables, Dairy, Bakery, Beverages, Grains, Snacks, Pantry
 - Real Indian brands — Amul, Tata, Britannia, Dabur, Haldiram's, Mother Dairy, Parle, and more
 - Discount badges, out-of-stock labels, delivery time estimates per product
 - Add to cart with live quantity controls — directly on product cards and detail pages
@@ -265,7 +265,7 @@ Open `src/data/products.js` and add an object to the `products` array:
 
 ```js
 {
-  id: 56,                          // unique id
+  id: 55,                          // unique id
   name: "Organic Turmeric Latte",
   brand: "Vahdam",
   category: "Beverages",           // must match a category name
