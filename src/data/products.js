@@ -1040,6 +1040,25 @@ export const products = [
     tags: ["pantry", "vinegar", "health"],
     deliveryTime: "45 mins",
   },
+  {
+    id: 55,
+    name: "Peanuts",
+    brand: "Fresh",
+    category: "Nuts",
+    price: 105,
+    originalPrice: 150,
+    unit: "100g Pack",
+    rating: 4.6,
+    reviews: 89,
+    image: "/chikoo.jpg",
+    badge: "SEASONAL",
+    badgeColor: "#e65100",
+    inStock: true,
+    description: "Caramel-sweet chikoo with a grainy texture. A childhood favourite loaded with natural sugars and fibre.",
+    farm: "Kerala Growers Collective",
+    tags: ["fruit", "chikoo", "seasonal"],
+    deliveryTime: "2 hrs",
+  },
 ];
 
 export const bannerDeals = [
@@ -1059,4 +1078,5 @@ export const bannerDeals = [
     bg: "linear-gradient(135deg, #e65100 0%, #bf360c 100%)",
     image: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=80",
   },
+  
 ];

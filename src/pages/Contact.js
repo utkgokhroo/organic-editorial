@@ -81,7 +81,7 @@ export default function Contact() {
                 <h3>Message Received!</h3>
                 <p>
                   Thank you for reaching out, {form.name.split(" ")[0]}!<br />
-                  Our team will get back to you within 2 hours.
+                  Our team will get back to you within 24 hours.
                 </p>
                 <button
                   className="btn-primary"
@@ -95,7 +95,7 @@ export default function Contact() {
               <>
                 <div className="contact-form-header">
                   <h2>Send us a message</h2>
-                  <p>We'll respond within 2 hours on working days</p>
+                  <p>We'll respond within 24 hours on working days</p>
                 </div>
                 <form className="contact-form-body" onSubmit={handleSubmit}>
                   <div className="contact-select-wrap">

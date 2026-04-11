@@ -7,7 +7,6 @@ import "../styles/Navbar.css";
 export default function Navbar() {
   const { itemCount, wishlist } = useCart();
   const [scrolled, setScrolled] = useState(false);
-  // note: delivery bar + navbar both fixed; page-wrapper uses --total-header
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
