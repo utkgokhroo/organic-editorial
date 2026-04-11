@@ -15,7 +15,7 @@ function getPasswordStrength(pw) {
 }
 
 export default function Auth() {
-  const [mode, setMode] = useState("login"); // "login" | "signup"
+  const [mode, setMode] = useState("login");
   const [showPw, setShowPw] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -32,7 +32,6 @@ export default function Auth() {
 
   const pwStrength = getPasswordStrength(signupForm.password);
 
-  // ── Validation ──
   function validateLogin() {
     const errs = {};
     if (!loginForm.email) errs.email = "Email is required";
@@ -192,7 +191,7 @@ export default function Auth() {
                         <input
                           type="email"
                           className={`auth-input${loginErrors.email ? " error" : ""}`}
-                          placeholder="priya@email.com"
+                          placeholder="your@email.com"
                           value={loginForm.email}
                           onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
                         />
@@ -267,7 +266,7 @@ export default function Auth() {
                           <input
                             type="text"
                             className={`auth-input${signupErrors.firstName ? " error" : ""}`}
-                            placeholder="Priya"
+                            placeholder="Utkarsh"
                             value={signupForm.firstName}
                             onChange={(e) => setSignupForm({ ...signupForm, firstName: e.target.value })}
                           />
@@ -281,7 +280,7 @@ export default function Auth() {
                           <input
                             type="text"
                             className={`auth-input${signupErrors.lastName ? " error" : ""}`}
-                            placeholder="Sharma"
+                            placeholder="Gokhroo"
                             value={signupForm.lastName}
                             onChange={(e) => setSignupForm({ ...signupForm, lastName: e.target.value })}
                           />
@@ -297,7 +296,7 @@ export default function Auth() {
                         <input
                           type="email"
                           className={`auth-input${signupErrors.email ? " error" : ""}`}
-                          placeholder="priya@email.com"
+                          placeholder="your@email.com"
                           value={signupForm.email}
                           onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
                         />
