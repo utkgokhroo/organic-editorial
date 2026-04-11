@@ -10,6 +10,7 @@ import Checkout from "./pages/Checkout";
 import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
 import Contact from "./pages/Contact";
+import Auth from "./pages/Auth";
 import "./styles/global.css";
 
 function AppRoutes() {
@@ -25,6 +26,7 @@ function AppRoutes() {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Auth />} />
       </Routes>
     </>
   );

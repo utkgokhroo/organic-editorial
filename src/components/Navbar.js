@@ -7,6 +7,7 @@ import "../styles/Navbar.css";
 export default function Navbar() {
   const { itemCount, wishlist } = useCart();
   const [scrolled, setScrolled] = useState(false);
+  // note: delivery bar + navbar both fixed; page-wrapper uses --total-header
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -52,7 +53,7 @@ export default function Navbar() {
   return (
     <>
       <div className="delivery-bar">
-        🌿 Free delivery on orders above ₹499 &nbsp;|&nbsp; 30-minute express delivery available
+        🌿 Free delivery on orders above <strong>₹499</strong> &nbsp;·&nbsp; ⚡ 30-minute express delivery available
       </div>
       <nav className={`navbar${scrolled ? " scrolled" : ""}`}>
         <div className="navbar-inner">
@@ -103,6 +104,7 @@ export default function Navbar() {
               { to: "/", label: "Home" },
               { to: "/products", label: "Products" },
               { to: "/contact", label: "Contact" },
+              { to: "/login", label: "Sign In" },
             ].map(({ to, label }) => (
               <NavLink
                 key={to}
@@ -132,7 +134,7 @@ export default function Navbar() {
                 <span className="nav-badge">{itemCount}</span>
               )}
             </Link>
-            <Link to="/profile" className="nav-icon-btn" title="Profile">
+            <Link to="/login" className="nav-icon-btn" title="Sign In">
               👤
             </Link>
           </div>
@@ -144,7 +146,7 @@ export default function Navbar() {
           { to: "/products", label: "🛍️ All Products" },
           { to: "/wishlist", label: "🤍 Wishlist" },
           { to: "/cart", label: "🛒 Cart" },
-          { to: "/profile", label: "👤 Profile" },
+          { to: "/login", label: "👤 Sign In" },
           { to: "/contact", label: "📞 Contact" },
         ].map(({ to, label }) => (
           <Link
