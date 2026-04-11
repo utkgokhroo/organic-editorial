@@ -138,7 +138,7 @@ export default function Auth() {
         </div>
 
         <div className="auth-left-footer">
-          © 2024 The Organic Editorial · FSSAI Licensed
+          © 2026 The Organic Editorial · FSSAI Licensed
         </div>
       </div>
 
