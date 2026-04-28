@@ -1,57 +1,90 @@
-// ── Global error handler ──────────────────────────────────
-const errorHandler = (err, req, res, next) => {
-  let error = { ...err };
-  error.message = err.message;
-  error.statusCode = err.statusCode || 500;
+const logger = require("../utils/logger");
 
-  // Log in development
-  if (process.env.NODE_ENV === "development") {
-    console.error("❌ Error:", err);
-  }
+// ─────────────────────────────────────────────────────────
+//  Global error handler
+//
+//  Express identifies error handlers by their 4-argument
+//  signature (err, req, res, next). All errors passed via
+//  next(error) in any controller land here.
+//
+//  Normalises every error into the standard response shape:
+//    { success: false, message: string }
+//  with an optional `errors` array for validation failures.
+// ─────────────────────────────────────────────────────────
+const errorHandler = (err, req, res, _next) => {
+  let statusCode = err.statusCode || 500;
+  let message    = err.message    || "Internal server error";
+  let errors     = null;
 
-  // Mongoose: bad ObjectId
+  // ── Mongoose: invalid ObjectId ──────────────────────────
   if (err.name === "CastError") {
-    error.message = `Resource not found with id: ${err.value}`;
-    error.statusCode = 404;
+    statusCode = 404;
+    message    = `Resource not found. Invalid ID: ${err.value}`;
   }
 
-  // Mongoose: duplicate key
+  // ── Mongoose: duplicate key (unique index violation) ────
   if (err.code === 11000) {
+    statusCode = 409;
     const field = Object.keys(err.keyValue)[0];
-    error.message = `${field.charAt(0).toUpperCase() + field.slice(1)} already exists.`;
-    error.statusCode = 409;
+    const value = err.keyValue[field];
+    message = `${field.charAt(0).toUpperCase() + field.slice(1)} "${value}" is already registered.`;
   }
 
-  // Mongoose: validation error
+  // ── Mongoose: schema validation failure ─────────────────
   if (err.name === "ValidationError") {
-    const messages = Object.values(err.errors).map((e) => e.message);
-    error.message = messages.join(". ");
-    error.statusCode = 400;
+    statusCode = 400;
+    errors  = Object.values(err.errors).map((e) => ({
+      field:   e.path,
+      message: e.message,
+    }));
+    message = "Validation failed";
   }
 
-  // JWT errors
+  // ── JWT: bad token ───────────────────────────────────────
   if (err.name === "JsonWebTokenError") {
-    error.message = "Invalid token. Please sign in again.";
-    error.statusCode = 401;
+    statusCode = 401;
+    message    = "Invalid token. Please log in again.";
   }
 
+  // ── JWT: expired token ───────────────────────────────────
   if (err.name === "TokenExpiredError") {
-    error.message = "Token expired. Please sign in again.";
-    error.statusCode = 401;
+    statusCode = 401;
+    message    = "Token expired. Please log in again.";
   }
 
-  res.status(error.statusCode).json({
-    success: false,
-    message: error.message || "Internal server error",
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
-  });
+  // ── Log the error (full stack in dev, message only in prod) ──
+  if (statusCode >= 500) {
+    logger.error(`${req.method} ${req.originalUrl} → ${statusCode}`, {
+      message:  err.message,
+      stack:    err.stack,
+      body:     req.body,
+    });
+  } else {
+    logger.warn(`${req.method} ${req.originalUrl} → ${statusCode}: ${message}`);
+  }
+
+  // ── Build response ───────────────────────────────────────
+  const response = { success: false, message };
+
+  if (errors) response.errors = errors;
+
+  // Expose stack trace only in development
+  if (process.env.NODE_ENV === "development" && statusCode >= 500) {
+    response.stack = err.stack;
+  }
+
+  return res.status(statusCode).json(response);
 };
 
-// ── 404 handler for unmatched routes ─────────────────────
-const notFound = (req, res, next) => {
-  const error = new Error(`Route not found: ${req.originalUrl}`);
-  error.statusCode = 404;
-  next(error);
+// ─────────────────────────────────────────────────────────
+//  404 handler — catches any request that matched no route
+// ─────────────────────────────────────────────────────────
+const notFound = (req, res) => {
+  logger.warn(`404 — Route not found: ${req.method} ${req.originalUrl}`);
+  return res.status(404).json({
+    success: false,
+    message: `Route not found: ${req.method} ${req.originalUrl}`,
+  });
 };
 
 module.exports = { errorHandler, notFound };
