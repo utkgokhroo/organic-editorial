@@ -1,4 +1,4 @@
-# Organic Editorial 🛒
+# The Organic Editorial 🛒
 
 A full-stack MERN supermarket application built for the Indian market with secure authentication, cart & order management, responsive UI, and scalable backend architecture.
 
