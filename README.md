@@ -4,7 +4,7 @@ A full-stack MERN supermarket application built for the Indian market with secur
 
 ---
 
-## 🚀 Features
+##  Features
 
 - JWT Authentication
 - Product Search, Filter & Sorting
@@ -18,7 +18,7 @@ A full-stack MERN supermarket application built for the Indian market with secur
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Frontend
 - React
@@ -39,12 +39,3 @@ A full-stack MERN supermarket application built for the Indian market with secur
 - express-validator
 
 ---
-
-## 📂 Project Structure
-
-```bash
-organic-editorial/
-├── backend/
-├── public/
-├── src/
-└── README.md
