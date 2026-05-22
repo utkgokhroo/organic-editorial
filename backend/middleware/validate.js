@@ -1,18 +1,16 @@
 const { validationResult } = require("express-validator");
+const { sendFailure } = require("../utils/apiResponse");
 
-// ── Run validation and return errors if any ───────────────
 const validate = (req, res, next) => {
   const errors = validationResult(req);
+
   if (!errors.isEmpty()) {
-    return res.status(400).json({
-      success: false,
-      message: "Validation failed",
-      errors: errors.array().map((e) => ({
-        field: e.path,
-        message: e.msg,
-      })),
-    });
+    return sendFailure(res, 400, "Validation failed", errors.array().map((entry) => ({
+      field: entry.path,
+      message: entry.msg,
+    })));
   }
+
   next();
 };
 

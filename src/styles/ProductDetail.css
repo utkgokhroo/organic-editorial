@@ -99,7 +99,26 @@
   margin: 12px 0;
 }
 
-.detail-stars { color: var(--accent); font-size: 15px; }
+.detail-stars {
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.detail-star-icon {
+  width: 14px;
+  height: 14px;
+  display: block;
+  fill: transparent;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}
+
+.detail-star-icon.active {
+  fill: currentColor;
+}
+
 .detail-rating-num { font-weight: 700; font-size: 14px; }
 .detail-reviews { font-size: 13px; color: var(--text-muted); }
 
@@ -219,12 +238,14 @@
 }
 
 .wishlist-btn-detail {
-  width: 52px;
+  min-width: 64px;
   height: 52px;
   border-radius: var(--radius-md);
   background: var(--bg);
   border: 1.5px solid var(--border);
-  font-size: 22px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--green);
   cursor: pointer;
   transition: var(--transition);
   display: flex;
@@ -249,7 +270,24 @@
   color: var(--text-secondary);
 }
 
-.perk-icon { font-size: 18px; }
+.perk-icon {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 10px;
+  background: var(--green-light);
+  color: var(--green);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-detail-svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
 .perk-item strong { color: var(--text-primary); }
 
 /* Product Story */
@@ -281,13 +319,49 @@
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 8px 16px;
+  padding: 10px 16px 10px 12px;
   font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
 }
 
-.story-tag span { color: var(--text-muted); font-weight: 400; }
+.story-tag-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--green-light);
+  color: var(--green);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.story-tag-icon .product-detail-svg {
+  width: 16px;
+  height: 16px;
+}
+
+.story-tag-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.25;
+}
+
+.story-tag-copy strong {
+  color: var(--text-primary);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.story-tag-copy span { color: var(--text-muted); font-weight: 400; }
 
 /* Nutrition */
 .nutrition-table {

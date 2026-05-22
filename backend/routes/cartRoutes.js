@@ -1,25 +1,32 @@
 const express = require("express");
-const { body, param } = require("express-validator");
+const { body } = require("express-validator");
 const {
   getCart,
   addItem,
   updateItem,
   removeItem,
   clearCart,
+  previewCoupon,
+  checkoutPreview,
 } = require("../controllers/cartController");
 const { verifyToken } = require("../middleware/auth");
-const validate        = require("../middleware/validate");
+const validate = require("../middleware/validate");
+const {
+  mongoIdParam,
+  optionalCouponCode,
+  requiredCouponCode,
+} = require("../validators/commonValidators");
 
 const router = express.Router();
 
-// All cart routes require a valid token
 router.use(verifyToken);
 
-// ── Validation rules ──────────────────────────────────────
 const addItemRules = [
   body("productId")
-    .notEmpty().withMessage("productId is required")
-    .isMongoId().withMessage("productId must be a valid ID"),
+    .notEmpty()
+    .withMessage("productId is required")
+    .isMongoId()
+    .withMessage("productId must be a valid ID"),
   body("quantity")
     .optional()
     .isInt({ min: 1, max: 50 })
@@ -27,22 +34,20 @@ const addItemRules = [
 ];
 
 const updateItemRules = [
-  param("productId").isMongoId().withMessage("productId must be a valid ID"),
+  ...mongoIdParam("productId"),
   body("quantity")
-    .notEmpty().withMessage("quantity is required")
+    .notEmpty()
+    .withMessage("quantity is required")
     .isInt({ min: 0, max: 50 })
     .withMessage("quantity must be an integer between 0 and 50"),
 ];
 
-const productIdParamRule = [
-  param("productId").isMongoId().withMessage("productId must be a valid ID"),
-];
-
-// ── Routes ────────────────────────────────────────────────
-router.get   ("/",                  getCart);
-router.post  ("/items",             addItemRules,    validate, addItem);
-router.put   ("/items/:productId",  updateItemRules, validate, updateItem);
-router.delete("/items/:productId",  productIdParamRule, validate, removeItem);
-router.delete("/",                  clearCart);
+router.get("/", getCart);
+router.post("/checkout-preview", optionalCouponCode, validate, checkoutPreview);
+router.post("/coupon", requiredCouponCode, validate, previewCoupon);
+router.post("/items", addItemRules, validate, addItem);
+router.put("/items/:productId", updateItemRules, validate, updateItem);
+router.delete("/items/:productId", mongoIdParam("productId"), validate, removeItem);
+router.delete("/", clearCart);
 
 module.exports = router;

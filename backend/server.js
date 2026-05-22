@@ -10,6 +10,7 @@ dotenv.config();
 
 const connectDB      = require("./config/db");
 const logger         = require("./utils/logger");
+const { sendSuccess } = require("./utils/apiResponse");
 const sanitize       = require("./middleware/sanitize");
 const { errorHandler, notFound } = require("./middleware/errorHandler");
 
@@ -23,6 +24,12 @@ const userRoutes    = require("./routes/userRoutes");
 connectDB();
 
 const app = express();
+app.set("etag", false);
+
+app.use("/api", (_req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
+});
 
 // ─────────────────────────────────────────────────────────
 //  Security middleware
@@ -69,25 +76,40 @@ app.use(logger.httpMiddleware);
 //  General limiter: 100 requests / 15 min per IP
 //  Auth limiter: 10 requests / 15 min per IP (stricter)
 // ─────────────────────────────────────────────────────────
+const isProduction = process.env.NODE_ENV === "production";
+const disableRateLimit = !isProduction && process.env.DISABLE_RATE_LIMIT === "true";
+const configuredGeneralLimit = parseInt(process.env.RATE_LIMIT_MAX, 10);
+const configuredAuthLimit = parseInt(process.env.AUTH_RATE_LIMIT_MAX, 10);
+const generalRateLimitMax = isProduction
+  ? configuredGeneralLimit || 100
+  : Math.max(configuredGeneralLimit || 0, 1000);
+const authRateLimitMax = isProduction
+  ? configuredAuthLimit || 10
+  : Math.max(configuredAuthLimit || 0, 100);
+
 const generalLimiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000,
-  max:      parseInt(process.env.RATE_LIMIT_MAX, 10)        || 100,
+  max:      generalRateLimitMax,
+  skip:     (req) => disableRateLimit || req.originalUrl === "/api/health",
   standardHeaders: true,
   legacyHeaders:   false,
   message: {
     success: false,
     message: "Too many requests. Please try again in 15 minutes.",
+    error: "RateLimitExceeded",
   },
 });
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.AUTH_RATE_LIMIT_MAX, 10) || 10,
+  max: authRateLimitMax,
+  skip: () => disableRateLimit,
   standardHeaders: true,
   legacyHeaders:   false,
   message: {
     success: false,
     message: "Too many login attempts. Please try again in 15 minutes.",
+    error: "AuthRateLimitExceeded",
   },
 });
 
@@ -98,14 +120,13 @@ app.use("/api/auth/register", authLimiter);
 // ─────────────────────────────────────────────────────────
 //  Health check — not behind rate limiter
 // ─────────────────────────────────────────────────────────
-app.get("/api/health", (_req, res) => {
-  res.status(200).json({
-    success:     true,
-    message:     "The Organic Editorial API is running",
+app.get("/api/health", (_req, res) =>
+  sendSuccess(res, 200, {
+    message: "The Organic Editorial API is running",
     environment: process.env.NODE_ENV,
-    timestamp:   new Date().toISOString(),
-  });
-});
+    timestamp: new Date().toISOString(),
+  })
+);
 
 // ─────────────────────────────────────────────────────────
 //  API Routes

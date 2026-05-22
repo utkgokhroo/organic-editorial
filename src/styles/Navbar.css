@@ -77,8 +77,12 @@
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
-  font-size: 16px;
   pointer-events: none;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .search-dropdown {
@@ -140,14 +144,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
+  min-width: 40px;
   height: 40px;
+  padding: 0 8px;
   border-radius: 10px;
   background: transparent;
   color: var(--text-secondary);
-  font-size: 20px;
   transition: var(--transition);
   text-decoration: none;
+  border: none;
+  font-family: var(--font-body);
+}
+
+.nav-svg-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  flex-shrink: 0;
 }
 
 .nav-icon-btn:hover {
@@ -156,6 +169,37 @@
 }
 
 .nav-icon-btn.active { color: var(--green); background: var(--green-light); }
+
+.nav-profile-btn {
+  width: 40px;
+  min-width: 40px;
+  padding: 0;
+  background: var(--green-light);
+  color: var(--green);
+  border-radius: 12px;
+}
+
+.nav-profile-btn:hover {
+  background: var(--green);
+  color: #fff;
+}
+
+.nav-signout-btn {
+  min-width: 96px;
+  padding: 0 14px;
+  border: 1.5px solid var(--border);
+  color: var(--text-secondary);
+  background: #fff;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.nav-signout-btn:hover {
+  border-color: var(--red);
+  background: var(--red-light);
+  color: var(--red);
+}
 
 .nav-badge {
   position: absolute;
@@ -240,6 +284,12 @@
 }
 
 .mobile-nav-link:hover { background: var(--green-light); color: var(--green); }
+
+.mobile-nav-button {
+  background: transparent;
+  text-align: left;
+  width: 100%;
+}
 
 .delivery-bar {
   background: var(--green);

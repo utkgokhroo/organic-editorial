@@ -14,6 +14,8 @@ const addressSchema = new mongoose.Schema(
     city:    { type: String, required: true, trim: true },
     state:   { type: String, required: true, trim: true },
     pincode: { type: String, required: true, trim: true },
+    fullName: { type: String, trim: true, default: "" },
+    phone: { type: String, trim: true, default: "" },
     isDefault: { type: Boolean, default: false },
   },
   { _id: true }
@@ -56,6 +58,12 @@ const userSchema = new mongoose.Schema(
       ],
     },
     address: [addressSchema],
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
     role: {
       type: String,
       enum: {
@@ -81,8 +89,8 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// ── Indexes ───────────────────────────────────────────────
-userSchema.index({ email: 1 });
+// Note: unique:true on `email` above already creates an index;
+// no need for a separate userSchema.index({ email: 1 }).
 
 // ── Pre-save: hash password ───────────────────────────────
 userSchema.pre("save", async function (next) {

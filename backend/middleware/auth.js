@@ -1,5 +1,6 @@
 const jwt  = require("jsonwebtoken");
 const User = require("../models/User");
+const { sendFailure } = require("../utils/apiResponse");
 
 // ─────────────────────────────────────────────────────────
 //  verifyToken
@@ -18,10 +19,7 @@ const verifyToken = async (req, res, next) => {
     }
 
     if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized. No token provided.",
-      });
+      return sendFailure(res, 401, "Unauthorized. No token provided.", "TokenMissing");
     }
 
     // ── 2. Verify signature and expiry ──────────────────
@@ -30,41 +28,24 @@ const verifyToken = async (req, res, next) => {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (jwtError) {
       if (jwtError.name === "TokenExpiredError") {
-        return res.status(401).json({
-          success: false,
-          message: "Unauthorized. Token has expired. Please log in again.",
-        });
+        return sendFailure(res, 401, "Unauthorized. Token has expired. Please log in again.", "TokenExpired");
       }
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized. Invalid token.",
-      });
+      return sendFailure(res, 401, "Unauthorized. Invalid token.", "TokenInvalid");
     }
 
     // ── 3. Confirm user still exists in DB ──────────────
     const user = await User.findById(decoded.id).select("+isActive +passwordChangedAt");
 
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized. The account for this token no longer exists.",
-      });
+      return sendFailure(res, 401, "Unauthorized. The account for this token no longer exists.", "UserNotFound");
     }
 
-    // ── 4. Confirm account is still active ──────────────
     if (!user.isActive) {
-      return res.status(403).json({
-        success: false,
-        message: "Forbidden. Your account has been deactivated.",
-      });
+      return sendFailure(res, 403, "Forbidden. Your account has been deactivated.", "AccountDeactivated");
     }
 
-    // ── 5. Confirm password hasn't changed since token was issued ──
     if (user.changedPasswordAfter(decoded.iat)) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized. Password was changed recently. Please log in again.",
-      });
+      return sendFailure(res, 401, "Unauthorized. Password was changed recently. Please log in again.", "PasswordChanged");
     }
 
     // ── 6. Attach user to request and continue ──────────
@@ -83,18 +64,11 @@ const verifyToken = async (req, res, next) => {
 // ─────────────────────────────────────────────────────────
 const isAdmin = (req, res, next) => {
   if (!req.user) {
-    // Guard against accidental use without verifyToken
-    return res.status(401).json({
-      success: false,
-      message: "Unauthorized. Please log in first.",
-    });
+    return sendFailure(res, 401, "Unauthorized. Please log in first.", "AuthRequired");
   }
 
   if (req.user.role !== "admin") {
-    return res.status(403).json({
-      success: false,
-      message: "Forbidden. Admin access required.",
-    });
+    return sendFailure(res, 403, "Forbidden. Admin access required.", "AdminRequired");
   }
 
   next();
@@ -107,10 +81,12 @@ const isAdmin = (req, res, next) => {
 const restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        success: false,
-        message: `Forbidden. This action requires one of the following roles: ${roles.join(", ")}.`,
-      });
+      return sendFailure(
+        res,
+        403,
+        `Forbidden. This action requires one of the following roles: ${roles.join(", ")}.`,
+        "RoleForbidden"
+      );
     }
     next();
   };

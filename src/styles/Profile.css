@@ -50,12 +50,29 @@
   font-weight: 500;
   color: var(--text-secondary);
   border-left: 3px solid transparent;
+  width: 100%;
+  background: transparent;
+  text-align: left;
 }
 
 .profile-nav-item:hover { background: var(--bg); color: var(--text-primary); }
 .profile-nav-item.active { color: var(--green); border-left-color: var(--green); background: var(--green-light); font-weight: 600; }
+.profile-signout { color: var(--red); margin-top: 8px; }
 
-.profile-nav-icon { font-size: 18px; flex-shrink: 0; }
+.profile-nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-svg-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
 
 /* Main content */
 .profile-content {
@@ -164,6 +181,12 @@
 .order-body { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
 .order-total { font-size: 15px; font-weight: 700; }
 .order-items-count { font-size: 13px; color: var(--text-muted); }
+.order-products {
+  font-size: 12px;
+  color: var(--text-secondary);
+  max-width: 360px;
+  text-align: right;
+}
 
 /* Addresses */
 .address-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }

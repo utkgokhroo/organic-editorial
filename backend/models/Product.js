@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { computeSalePrice } = require("../utils/commerce");
 
 const productSchema = new mongoose.Schema(
   {
@@ -110,8 +111,7 @@ const productSchema = new mongoose.Schema(
 
 // Derived selling price after applying discount
 productSchema.virtual("salePrice").get(function () {
-  if (!this.discount) return this.price;
-  return Math.round(this.price * (1 - this.discount / 100));
+  return computeSalePrice(this.price, this.discount);
 });
 
 // Convenience boolean driven by stock count

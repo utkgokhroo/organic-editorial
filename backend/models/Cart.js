@@ -1,4 +1,10 @@
 const mongoose = require("mongoose");
+const {
+  computeSubtotal,
+  computeGst,
+  computeDeliveryFee,
+  computeItemCount,
+} = require("../utils/commerce");
 
 // ─────────────────────────────────────────────────────────
 //  Cart item sub-document
@@ -14,6 +20,8 @@ const cartItemSchema = new mongoose.Schema(
       required: [true, "Product reference is required"],
     },
     name: { type: String, required: true },
+    brand: { type: String, default: "" },
+    unit: { type: String, default: "" },
     image: { type: String, required: true },
     price: {
       type: Number,
@@ -51,23 +59,19 @@ const cartSchema = new mongoose.Schema(
 );
 
 // ─────────────────────────────────────────────────────────
-//  Virtuals — all price calculations on the backend
+//  Virtuals — delegate to commerce.js
 // ─────────────────────────────────────────────────────────
 
-const GST_RATE             = 0.05;  // 5%
-const DELIVERY_FEE         = 49;
-const FREE_DELIVERY_ABOVE  = 499;
-
 cartSchema.virtual("subtotal").get(function () {
-  return this.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  return computeSubtotal(this.items);
 });
 
 cartSchema.virtual("gst").get(function () {
-  return Math.round(this.subtotal * GST_RATE);
+  return computeGst(this.subtotal);
 });
 
 cartSchema.virtual("deliveryFee").get(function () {
-  return this.subtotal >= FREE_DELIVERY_ABOVE ? 0 : DELIVERY_FEE;
+  return computeDeliveryFee(this.subtotal);
 });
 
 cartSchema.virtual("total").get(function () {
@@ -75,13 +79,11 @@ cartSchema.virtual("total").get(function () {
 });
 
 cartSchema.virtual("itemCount").get(function () {
-  return this.items.reduce((sum, item) => sum + item.quantity, 0);
+  return computeItemCount(this.items);
 });
 
-// ─────────────────────────────────────────────────────────
-//  Index
-// ─────────────────────────────────────────────────────────
-cartSchema.index({ user: 1 });
+// Note: the unique:true constraint on `user` above already creates a unique index;
+// no need to call cartSchema.index({ user: 1 }) separately.
 
 const Cart = mongoose.model("Cart", cartSchema);
 

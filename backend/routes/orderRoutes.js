@@ -1,5 +1,5 @@
 const express = require("express");
-const { body } = require("express-validator");
+const { body, param, query } = require("express-validator");
 const {
   createOrder,
   getMyOrders,
@@ -9,6 +9,12 @@ const {
 } = require("../controllers/orderController");
 const { verifyToken, isAdmin } = require("../middleware/auth");
 const validate = require("../middleware/validate");
+const {
+  mongoIdParam,
+  paginationQuery,
+  optionalCouponCode,
+  indianPhone,
+} = require("../validators/commonValidators");
 
 const router = express.Router();
 
@@ -19,9 +25,7 @@ router.use(verifyToken);
 const createOrderRules = [
   body("deliveryAddress.fullName")
     .trim().notEmpty().withMessage("Delivery name is required"),
-  body("deliveryAddress.phone")
-    .trim().notEmpty().withMessage("Delivery phone is required")
-    .matches(/^[6-9]\d{9}$/).withMessage("Enter a valid 10-digit Indian mobile number"),
+  indianPhone("deliveryAddress.phone"),
   body("deliveryAddress.line1")
     .trim().notEmpty().withMessage("Address line 1 is required"),
   body("deliveryAddress.city")
@@ -40,6 +44,11 @@ const createOrderRules = [
     .optional()
     .isIn(["express", "scheduled"])
     .withMessage("deliveryType must be express or scheduled"),
+  body("deliverySlot")
+    .optional()
+    .isLength({ max: 80 })
+    .withMessage("deliverySlot cannot exceed 80 characters"),
+  ...optionalCouponCode,
 ];
 
 const updateStatusRules = [
@@ -52,14 +61,22 @@ const updateStatusRules = [
     .isLength({ max: 300 }).withMessage("Note cannot exceed 300 characters"),
 ];
 
+const orderIdParamRules = mongoIdParam("id", "Order id");
+
+const paginationRules = [
+  ...paginationQuery({ maxLimit: 100, defaultLimit: 10 }),
+  query("status").optional().isIn(["placed", "confirmed", "processing", "shipped", "delivered", "cancelled"])
+    .withMessage("Invalid status value"),
+];
+
 // ── User routes ───────────────────────────────────────────
 // NOTE: /my must come before /:id so Express doesn't treat "my" as an id
 router.post("/",    createOrderRules, validate, createOrder);
-router.get( "/my",  getMyOrders);
-router.get( "/:id", getOrder);
+router.get( "/my",  paginationRules, validate, getMyOrders);
+router.get( "/:id", orderIdParamRules, validate, getOrder);
 
 // ── Admin only ────────────────────────────────────────────
-router.get("/"          , isAdmin, getAllOrders);
-router.put("/:id/status", isAdmin, updateStatusRules, validate, updateOrderStatus);
+router.get("/"          , isAdmin, paginationRules, validate, getAllOrders);
+router.put("/:id/status", isAdmin, orderIdParamRules, updateStatusRules, validate, updateOrderStatus);
 
 module.exports = router;

@@ -8,6 +8,8 @@ const orderItemSchema = new mongoose.Schema(
       required: true,
     },
     name: { type: String, required: true },
+    brand: { type: String, default: "" },
+    unit: { type: String, default: "" },
     image: { type: String, required: true },
     price: { type: Number, required: true },
     quantity: { type: Number, required: true, min: 1 },
@@ -108,7 +110,6 @@ orderSchema.pre("save", function (next) {
 
 // ── Index ────────────────────────────────────────────────
 orderSchema.index({ user: 1, createdAt: -1 });
-orderSchema.index({ orderId: 1 });
 orderSchema.index({ status: 1 });
 
 const Order = mongoose.model("Order", orderSchema);

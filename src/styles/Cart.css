@@ -107,7 +107,8 @@
 .cart-remove-btn {
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
   color: var(--text-muted);
   transition: color 0.15s;

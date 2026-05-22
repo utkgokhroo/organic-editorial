@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
-import { products, categories, bannerDeals } from "../data/products";
+import { categories, bannerDeals, products as localProducts } from "../data/products";
+import { productApi } from "../services/api";
+import { formatPrice, normalizeProduct } from "../utils/productUtils";
 import "../styles/Home.css";
+
+// Pre-normalize local products once at module load
+const normalizedLocal = localProducts.map(normalizeProduct);
 
 const trustItems = [
   { icon: "🌿", title: "100% Organic", desc: "Certified by NPOP & PGS-India" },
@@ -14,29 +19,73 @@ const trustItems = [
 
 export default function Home() {
   const [activeBanner, setActiveBanner] = useState(0);
+  const [featured, setFeatured] = useState([]);
+  const [trending, setTrending] = useState([]);
+  const [deals, setDeals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const t = setInterval(() => setActiveBanner((p) => (p + 1) % bannerDeals.length), 4000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setActiveBanner((prev) => (prev + 1) % bannerDeals.length), 4000);
+    return () => clearInterval(timer);
   }, []);
 
-  const featured = products.filter((p) => p.inStock).slice(0, 8);
-  const trending = products.filter((p) => p.badge && p.inStock).slice(0, 4);
-  const deals = products.filter((p) => p.originalPrice > p.price && p.inStock).slice(0, 2);
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError("");
+
+    // ── Helper: apply local sort ──────────────────────────
+    const sortLocal = (arr, sort) => {
+      const copy = [...arr];
+      switch (sort) {
+        case "rating":   return copy.sort((a, b) => b.rating - a.rating);
+        case "discount": return copy.sort((a, b) => (b.originalPrice - b.price) / b.originalPrice - (a.originalPrice - a.price) / a.originalPrice);
+        default:         return copy; // newest: keep data order
+      }
+    };
+
+    Promise.all([
+      productApi.list({ limit: 8, sort: "newest", inStock: true }),
+      productApi.list({ limit: 4, sort: "rating", inStock: true }),
+      productApi.list({ limit: 2, sort: "discount", inStock: true }),
+    ])
+      .then(([featuredResponse, trendingResponse, dealsResponse]) => {
+        if (!active) return;
+        setFeatured(featuredResponse.data.products);
+        setTrending(trendingResponse.data.products);
+        setDeals(dealsResponse.data.products);
+      })
+      .catch(() => {
+        // ── API unavailable — fall back to local dataset ──
+        if (!active) return;
+        const inStock = normalizedLocal.filter((p) => p.inStock);
+        setFeatured(sortLocal(inStock, "newest").slice(0, 8));
+        setTrending(sortLocal(inStock, "rating").slice(0, 4));
+        setDeals(sortLocal(inStock, "discount").slice(0, 2));
+        // Don't set an error so the UI renders cleanly with local data
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <div className="page-wrapper home-page">
       <div className="container">
-        {/* Hero Banner */}
         <div className="hero-slider">
-          {bannerDeals.map((banner, idx) => (
+          {bannerDeals.map((banner, index) => (
             <div
               key={banner.id}
               className="hero-slide"
               style={{
                 background: banner.bg,
-                display: idx === activeBanner ? "flex" : "none",
+                display: index === activeBanner ? "flex" : "none",
               }}
             >
               <div className="hero-content">
@@ -44,31 +93,31 @@ export default function Home() {
                 <h1 className="hero-title">{banner.title}</h1>
                 <p className="hero-subtitle">{banner.subtitle}</p>
                 <Link to="/products" className="hero-btn">
-                  {banner.cta} →
+                  {banner.cta}
                 </Link>
               </div>
               <img src={banner.image} alt={banner.title} className="hero-image" />
             </div>
           ))}
           <div className="hero-dots">
-            {bannerDeals.map((_, i) => (
+            {bannerDeals.map((_, index) => (
               <button
-                key={i}
-                className={`hero-dot${i === activeBanner ? " active" : ""}`}
-                onClick={() => setActiveBanner(i)}
+                key={index}
+                className={`hero-dot${index === activeBanner ? " active" : ""}`}
+                onClick={() => setActiveBanner(index)}
+                aria-label={`Show banner ${index + 1}`}
               />
             ))}
           </div>
         </div>
 
-        {/* Categories */}
         <div className="home-section">
           <div className="home-section-header">
             <div>
               <h2 className="section-title">Shop by Category</h2>
               <p className="section-subtitle">Fresh picks from every aisle</p>
             </div>
-            <Link to="/products" className="view-all-link">View All →</Link>
+            <Link to="/products" className="view-all-link">View All</Link>
           </div>
           <div className="categories-grid">
             {categories.map((cat) => (
@@ -85,84 +134,96 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Trust Strip */}
         <div className="trust-strip">
-          {trustItems.map((t, i) => (
-            <div className="trust-item" key={i}>
-              <span className="trust-icon">{t.icon}</span>
+          {trustItems.map((item) => (
+            <div className="trust-item" key={item.title}>
+              <span className="trust-icon">{item.icon}</span>
               <div>
-                <div className="trust-title">{t.title}</div>
-                <div className="trust-desc">{t.desc}</div>
+                <div className="trust-title">{item.title}</div>
+                <div className="trust-desc">{item.desc}</div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Trending */}
-        <div className="home-section">
-          <div className="home-section-header">
-            <div>
-              <h2 className="section-title">Trending Now</h2>
-              <p className="section-subtitle">Most loved by our community</p>
-            </div>
-            <Link to="/products" className="view-all-link">View All →</Link>
-          </div>
-          <div className="products-grid">
-            {trending.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </div>
+        {error && <div className="alert-error">{error}</div>}
+        {loading && <div className="loading-spinner"><div className="spinner" /></div>}
 
-        {/* Deal Banner */}
-        <div className="deal-banner">
-          <div>
-            <div className="deal-label">Best Deals of the Week</div>
-            <div className="deal-title">
-              Hand-picked by<br />our curators
+        {!loading && trending.length > 0 && (
+          <div className="home-section">
+            <div className="home-section-header">
+              <div>
+                <h2 className="section-title">Trending Now</h2>
+                <p className="section-subtitle">Most loved by our community</p>
+              </div>
+              <Link to="/products?sort=rating" className="view-all-link">View All</Link>
             </div>
-            <p className="deal-desc">
-              Our team scours local farms and trusted brands to bring you the best value every week.
-            </p>
-            <Link to="/products" className="hero-btn" style={{ background: "#fff", color: "#1b5e20" }}>
-              Explore Deals →
-            </Link>
+            <div className="products-grid">
+              {trending.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
           </div>
-          <div className="deal-items">
-            {deals.map((p) => (
-              <div
-                className="deal-item"
-                key={p.id}
-                onClick={() => navigate(`/product/${p.id}`)}
-                style={{ cursor: "pointer" }}
-              >
-                <img src={p.image} alt={p.name} />
-                <div>
-                  <div className="deal-item-name">{p.name}</div>
-                  <div className="deal-item-offer">
-                    {Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}% OFF · ₹{p.price}
+        )}
+
+        {!loading && deals.length > 0 && (
+          <div className="deal-banner">
+            <div>
+              <div className="deal-label">Best Deals of the Week</div>
+              <div className="deal-title">Hand-picked by<br />our curators</div>
+              <p className="deal-desc">
+                Our team works with trusted farms and brands to bring the best value every week.
+              </p>
+              <Link to="/products?sort=discount" className="hero-btn" style={{ background: "#fff", color: "#1b5e20" }}>
+                Explore Deals
+              </Link>
+            </div>
+            <div className="deal-items">
+              {deals.map((product) => (
+                <div
+                  className="deal-item"
+                  key={product.id}
+                  onClick={() => navigate(`/product/${product.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <img src={product.image} alt={product.name} />
+                  <div>
+                    <div className="deal-item-name">{product.name}</div>
+                    <div className="deal-item-offer">
+                      {product.discount}% OFF - {formatPrice(product.price)}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Featured Products */}
-        <div className="home-section">
-          <div className="home-section-header">
-            <div>
-              <h2 className="section-title">Our Selection</h2>
-              <p className="section-subtitle">Curated for optimal nutrition & taste</p>
+              ))}
             </div>
-            <Link to="/products" className="view-all-link">View All →</Link>
           </div>
-          <div className="products-grid">
-            {featured.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
+        )}
+
+        {!loading && featured.length > 0 && (
+          <div className="home-section">
+            <div className="home-section-header">
+              <div>
+                <h2 className="section-title">Our Selection</h2>
+                <p className="section-subtitle">Curated for optimal nutrition and taste</p>
+              </div>
+              <Link to="/products" className="view-all-link">View All</Link>
+            </div>
+            <div className="products-grid">
+              {featured.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {!loading && !error && featured.length === 0 && (
+          <div className="empty-state">
+            <div className="icon">Products</div>
+            <h3>No products available yet</h3>
+            <p>Add products from the backend or run the product seed script.</p>
+            <Link to="/products" className="btn-primary">Browse Products</Link>
+          </div>
+        )}
       </div>
       <Footer />
     </div>
