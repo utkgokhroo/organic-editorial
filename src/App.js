@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
@@ -20,11 +20,13 @@ function AppRoutes() {
   return (
     <>
       <Navbar />
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
+
         <Route
           path="/checkout"
           element={
@@ -33,6 +35,7 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/wishlist"
           element={
@@ -41,6 +44,7 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/profile"
           element={
@@ -49,7 +53,9 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
         <Route path="/contact" element={<Contact />} />
+
         <Route
           path="/login"
           element={
@@ -58,6 +64,8 @@ function AppRoutes() {
             </GuestRoute>
           }
         />
+        <Route path="/auth" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   );
