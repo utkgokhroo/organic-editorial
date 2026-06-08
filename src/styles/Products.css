@@ -81,7 +81,9 @@
 }
 
 /* Right side */
-.products-right {}
+.products-right {
+  padding-bottom: 48px;
+}
 
 .products-toolbar {
   display: flex;
@@ -167,6 +169,15 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 32px;
+  flex-wrap: wrap;
 }
 
 .mobile-filter-btn {

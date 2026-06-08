@@ -135,7 +135,7 @@ export function CartProvider({ children }) {
             response = await userApi.removeFromWishlist(productId);
             break;
           default:
-            return wishlist;
+            return [];
         }
 
         setWishlist(response.data.wishlist);
@@ -148,7 +148,7 @@ export function CartProvider({ children }) {
         setWishlistLoading(false);
       }
     },
-    [requireAuth, wishlist]
+    [requireAuth]
   );
 
   const value = useMemo(
